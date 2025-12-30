@@ -1,0 +1,56 @@
+Sql
+
+CREATE DATABASE library_db;
+USE library_db;
+
+
+CREATE TABLE books (
+    book_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100),
+    author VARCHAR(100),
+    category VARCHAR(50),
+    total_copies INT,
+    available_copies INT
+);
+
+CREATE TABLE members (
+    member_id INT AUTO_INCREMENT PRIMARY KEY,
+    member_name VARCHAR(100),
+    email VARCHAR(100),
+    join_date DATE
+);
+
+CREATE TABLE book_issues (
+    issue_id INT AUTO_INCREMENT PRIMARY KEY,
+    book_id INT,
+    member_id INT,
+    issue_date DATE,
+    return_date DATE,
+    FOREIGN KEY (book_id) REFERENCES books(book_id),
+    FOREIGN KEY (member_id) REFERENCES members(member_id)
+);
+
+INSERT INTO books (title, author, category, total_copies, available_copies)
+VALUES
+('Atomic Habits', 'James Clear', 'Self Help', 5, 5),
+('Clean Code', 'Robert C Martin', 'Programming', 3, 3);
+
+INSERT INTO book_issues (book_id, member_id, issue_date)
+VALUES (1, 1, CURDATE());
+
+UPDATE books
+SET available_copies = available_copies - 1
+WHERE book_id = 1;
+
+UPDATE book_issues
+SET return_date = CURDATE()
+WHERE issue_id = 1;
+
+UPDATE books
+SET available_copies = available_copies + 1
+WHERE book_id = 1;
+SELECT m.member_name, b.title, bi.issue_date
+FROM book_issues bi
+JOIN members m ON bi.member_id = m.member_id
+JOIN books b ON bi.book_id = b.book_id
+WHERE bi.return_date IS NULL;
